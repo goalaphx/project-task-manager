@@ -8,7 +8,10 @@ import com.proj.taskbackend.core.enums.TaskStatus;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "tasks", indexes = {
+    @Index(name = "idx_tasks_project_id", columnList = "project_id"),
+    @Index(name = "idx_tasks_project_status", columnList = "project_id, status")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

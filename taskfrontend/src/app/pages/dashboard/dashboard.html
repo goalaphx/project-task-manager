@@ -1,0 +1,141 @@
+<div class="container-fluid py-4 px-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-bold mb-2" style="color: var(--text-primary);">My Projects</h2>
+            <p class="text-muted mb-0">Manage your projects and track progress</p>
+        </div>
+        <button class="btn btn-primary shadow-sm d-flex align-items-center gap-2" (click)="focusInput()">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>New Project</span>
+        </button>
+    </div>
+
+    <div class="row g-4">
+        <!-- Projects Grid -->
+        <div class="col-lg-8">
+            <!-- Error Alert -->
+            <div *ngIf="error" class="alert alert-danger d-flex align-items-center mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span>{{error}}</span>
+            </div>
+            
+            <!-- Empty State -->
+            <div *ngIf="projects.length === 0" class="text-center py-5 bg-white rounded-3 shadow-sm">
+                <div class="mb-3">
+                    <i class="bi bi-folder-x text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                </div>
+                <h4 class="text-muted mb-2">No projects yet</h4>
+                <p class="text-muted mb-0">Create your first project to get started</p>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="col fade-in" *ngFor="let p of projects; trackBy: trackByProject">
+                    <div class="card h-100 border-0 shadow-sm position-relative" 
+                         style="cursor: pointer; transition: all 0.2s ease; border-radius: var(--radius-lg);"
+                         (click)="open(p)"
+                         (mouseenter)="$any($event.currentTarget).style.transform='translateY(-4px)'; $any($event.currentTarget).style.boxShadow='var(--shadow-lg)'"
+                         (mouseleave)="$any($event.currentTarget).style.transform='translateY(0)'; $any($event.currentTarget).style.boxShadow='var(--shadow-sm)'">
+                        
+                        <!-- Delete Button -->
+                        <button class="btn btn-sm position-absolute top-0 end-0 m-3" 
+                                style="z-index: 10; background: var(--danger-light); color: var(--danger); border: none; width: 32px; height: 32px; border-radius: var(--radius); padding: 0;"
+                                (click)="deleteProject(p, $event)"
+                                title="Delete Project">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+
+                        <div class="card-body d-flex flex-column p-4">
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title fw-bold mb-0 text-truncate pe-3" 
+                                    [title]="p.title"
+                                    style="color: var(--text-primary);">
+                                    {{p.title}}
+                                </h5>
+                                <span class="badge d-flex align-items-center gap-1" 
+                                      style="background: var(--surface-hover); color: var(--text-secondary); border: 1px solid var(--border); white-space: nowrap;">
+                                    <i class="bi bi-list-task"></i>
+                                    <span>{{p.taskCount || 0}}</span>
+                                </span>
+                            </div>
+                            
+                            <!-- Description -->
+                            <p class="card-text text-muted small flex-grow-1 line-clamp-2 mb-3" style="min-height: 2.5rem;">
+                                {{p.description || 'No description provided.'}}
+                            </p>
+                            
+                            <!-- Progress Section -->
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small fw-medium" style="color: var(--text-secondary);">Progress</span>
+                                    <span class="small fw-bold" style="color: var(--primary);">
+                                        {{p.progress?.toFixed(0) || 0}}%
+                                    </span>
+                                </div>
+                                <div class="progress" style="height: 8px; border-radius: var(--radius);">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         [style.width.%]="p.progress || 0"
+                                         [style.background]="(p.progress || 0) === 100 ? 'var(--success)' : 'linear-gradient(90deg, var(--primary), var(--primary-hover))'"></div>
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    {{p.completedTaskCount || 0}} of {{p.taskCount || 0}} tasks completed
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: Create Project Form -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" 
+                 style="top: 20px; z-index: 5; border-radius: var(--radius-lg);">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <div class="d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: var(--primary-light); border-radius: var(--radius);">
+                            <i class="bi bi-folder-plus text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-0">Create Project</h5>
+                    </div>
+                    
+                    <form (ngSubmit)="create()">
+                        <div class="mb-3">
+                            <label for="projTitle" class="form-label fw-medium small">Project Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="projTitle" 
+                                   name="name" 
+                                   [(ngModel)]="newName" 
+                                   placeholder="Enter project name" 
+                                   required 
+                                   #titleInput>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="projDesc" class="form-label fw-medium small">Description</label>
+                            <textarea class="form-control" 
+                                      placeholder="What is this project about?" 
+                                      id="projDesc" 
+                                      name="desc" 
+                                      [(ngModel)]="newDescription" 
+                                      style="height: 100px; resize: none;"></textarea>
+                        </div>
+                        
+                        <button class="btn btn-dark w-100 py-2 fw-medium" 
+                                type="submit" 
+                                [disabled]="addingProject || !newName">
+                            <span *ngIf="addingProject" class="spinner-border spinner-border-sm me-2"></span>
+                            <i *ngIf="!addingProject" class="bi bi-plus-lg me-2"></i>
+                            {{ addingProject ? 'Creating...' : 'Create Project' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

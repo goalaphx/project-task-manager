@@ -14,4 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     // Bonus: Search tasks within a specific project with Pagination
     Page<Task> findByProjectIdAndTitleContaining(Long projectId, String title, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Query("SELECT t.project.id, COUNT(t), SUM(CASE WHEN t.status = com.proj.taskbackend.core.enums.TaskStatus.COMPLETED THEN 1 ELSE 0 END) FROM Task t WHERE t.project.id IN :ids GROUP BY t.project.id")
+    java.util.List<Object[]> countTotalsByProjectIds(@org.springframework.data.repository.query.Param("ids") java.util.List<Long> ids);
 }

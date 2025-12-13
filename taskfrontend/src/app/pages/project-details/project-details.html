@@ -1,0 +1,180 @@
+<div class="container py-4">
+    <!-- Back Button -->
+    <a routerLink="/dashboard" 
+       class="btn btn-outline-secondary btn-sm mb-4 d-inline-flex align-items-center gap-2 border-0"
+       style="background: var(--surface); box-shadow: var(--shadow-sm);">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Dashboard</span>
+    </a>
+
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Project Header Card -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: var(--radius-lg);">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-folder-fill text-primary fs-5"></i>
+                                <h2 class="fw-bold mb-0">{{ project?.title }}</h2>
+                            </div>
+                            <p class="text-muted mb-0">{{ project?.description || 'No description available' }}</p>
+                        </div>
+                        <div class="text-end ms-3">
+                            <div class="display-6 fw-bold mb-1" 
+                                 [style.color]="(project?.progress || 0) === 100 ? 'var(--success)' : 'var(--primary)'">
+                                {{project?.progress?.toFixed(0) || 0}}%
+                            </div>
+                            <small class="text-muted">Complete</small>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-2" style="height: 12px; border-radius: var(--radius);">
+                        <div class="progress-bar" 
+                             role="progressbar" 
+                             [style.width.%]="project?.progress || 0"
+                             [style.background]="(project?.progress || 0) === 100 ? 'var(--success)' : 'linear-gradient(90deg, var(--primary), var(--primary-hover))'"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-check-circle-fill me-1" [style.color]="'var(--success)'"></i>
+                            {{project?.completedTaskCount || 0}} of {{project?.taskCount || 0}} tasks completed
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Header -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">Tasks</h4>
+                <span class="badge" style="background: var(--primary-light); color: var(--primary); font-size: 0.875rem;">
+                    {{tasks.length}} Total
+                </span>
+            </div>
+
+            <!-- Error Alert -->
+            <div *ngIf="error" class="alert alert-danger d-flex align-items-center mb-3">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span>{{error}}</span>
+            </div>
+            
+            <!-- Empty State -->
+            <div *ngIf="tasks.length === 0" class="text-center py-5 bg-white rounded-3 shadow-sm">
+                <div class="mb-3">
+                    <i class="bi bi-list-task text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                </div>
+                <p class="text-muted mb-0">No tasks yet. Add your first task!</p>
+            </div>
+
+            <!-- Tasks List -->
+            <ul class="list-group gap-3" style="list-style: none; padding: 0;">
+                <li *ngFor="let t of tasks; trackBy: trackByTask" 
+                    class="list-group-item border shadow-sm d-flex justify-content-between align-items-center p-3 fade-in"
+                    style="border-radius: var(--radius-lg); transition: var(--transition);"
+                    [style.background]="t.status === 'COMPLETED' ? 'var(--surface-hover)' : 'var(--surface)'"
+                    [style.opacity]="t.status === 'COMPLETED' ? '0.85' : '1'">
+                    
+                    <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 0;">
+                        <!-- Status Icon -->
+                        <div class="flex-shrink-0">
+                            <div *ngIf="t.status === 'COMPLETED'" 
+                                 class="d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px; background: var(--success-light); border-radius: 50%;">
+                                <i class="bi bi-check-circle-fill" style="color: var(--success); font-size: 1.25rem;"></i>
+                            </div>
+                            <div *ngIf="t.status !== 'COMPLETED'" 
+                                 class="d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px; background: var(--border-light); border-radius: 50%;">
+                                <i class="bi bi-circle" style="color: var(--text-muted); font-size: 1.25rem;"></i>
+                            </div>
+                        </div>
+
+                        <!-- Task Content -->
+                        <div class="flex-grow-1" style="min-width: 0;">
+                            <div class="fw-semibold mb-1" 
+                                 [class.text-decoration-line-through]="t.status === 'COMPLETED'"
+                                 [style.color]="t.status === 'COMPLETED' ? 'var(--text-muted)' : 'var(--text-primary)'">
+                                {{t.title}}
+                            </div>
+                            <div class="small text-muted text-truncate" *ngIf="t.description">
+                                {{t.description}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex align-items-center gap-2 ms-3">
+                        <span *ngIf="isTempId(t.id)" 
+                              class="badge d-flex align-items-center gap-1" 
+                              style="background: var(--warning-light); color: var(--warning);">
+                            <span class="spinner-border spinner-border-sm"></span>
+                            <span>Saving</span>
+                        </span>
+
+                        <button *ngIf="t.status !== 'COMPLETED' && !isTempId(t.id)" 
+                                class="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+                                (click)="completeTask(t)" 
+                                [disabled]="isPendingId(t.id)"
+                                style="border-radius: var(--radius);">
+                            <span *ngIf="isPendingId(t.id)" class="spinner-border spinner-border-sm"></span>
+                            <i *ngIf="!isPendingId(t.id)" class="bi bi-check-lg"></i>
+                            <span *ngIf="!isPendingId(t.id)">Done</span>
+                        </button>
+
+                        <button class="btn btn-sm border-0" 
+                                style="background: var(--danger-light); color: var(--danger); border-radius: var(--radius);"
+                                (click)="deleteTaskById(t)" 
+                                [disabled]="isDeletingId(t.id)"
+                                title="Delete task">
+                            <i *ngIf="!isDeletingId(t.id)" class="bi bi-trash-fill"></i>
+                            <span *ngIf="isDeletingId(t.id)" class="spinner-border spinner-border-sm"></span>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar: Add Task Form -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" 
+                 style="top: 20px; border-radius: var(--radius-lg);">
+                <div class="card-body p-4" style="background: var(--surface);">
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <div class="d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: var(--primary-light); border-radius: var(--radius);">
+                            <i class="bi bi-plus-circle-fill text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-0">Add New Task</h5>
+                    </div>
+                    
+                    <form (ngSubmit)="addTask()">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium small">Task Title</label>
+                            <input class="form-control" 
+                                   name="title" 
+                                   [(ngModel)]="newTitle" 
+                                   required 
+                                   placeholder="What needs to be done?">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium small">Description</label>
+                            <textarea class="form-control" 
+                                      name="desc" 
+                                      [(ngModel)]="newDescription" 
+                                      placeholder="Add details..."
+                                      style="height: 100px; resize: none;"></textarea>
+                        </div>
+                        <button class="btn btn-dark w-100 py-2 fw-medium" 
+                                type="submit" 
+                                [disabled]="addingTask || !newTitle">
+                            <span *ngIf="addingTask" class="spinner-border spinner-border-sm me-2"></span>
+                            <i *ngIf="!addingTask" class="bi bi-plus-lg me-2"></i>
+                            {{ addingTask ? 'Adding...' : 'Add Task' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
