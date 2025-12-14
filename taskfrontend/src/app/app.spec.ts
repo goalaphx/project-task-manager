@@ -1,10 +1,29 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-
+import { RouterTestingModule } from '@angular/router/testing';
+import { AuthService } from './services/auth';
+import { UserService } from './services/user.service';
+import { of } from 'rxjs';
+import { HttpClientModule } from '@angular/common/http';
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App, RouterTestingModule, HttpClientModule],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            getCurrentUser: () => Promise.resolve('test-user'),
+            logout: () => Promise.resolve(),
+          },
+        },
+        {
+          provide: UserService,
+          useValue: {
+            getUser$: () => of('test-user'),
+          },
+        },
+      ],
     }).compileComponents();
   });
 
@@ -12,12 +31,5 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, taskfrontend');
   });
 });

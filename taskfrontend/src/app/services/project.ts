@@ -28,6 +28,10 @@ export class ProjectService {
     return this.http.post<ProjectDTO>(this.apiUrl, p);
   }
 
+  updateProject(id: number, p: ProjectDTO) {
+    return this.http.put<ProjectDTO>(`${this.apiUrl}/${id}`, p);
+  }
+
   // ADD THIS IF MISSING
   deleteProject(id: number) {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

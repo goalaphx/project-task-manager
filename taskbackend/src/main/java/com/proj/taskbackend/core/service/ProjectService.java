@@ -145,4 +145,20 @@ public class ProjectService {
 
         projectRepository.delete(project);
     }
+
+    public ProjectDTO updateProject(Long id, ProjectDTO projectDto) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        User user = getCurrentUser();
+        if (!project.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Not authorized to update this project");
+        }
+
+        project.setTitle(projectDto.getTitle());
+        project.setDescription(projectDto.getDescription());
+
+        Project updatedProject = projectRepository.save(project);
+        return getProjectById(updatedProject.getId());
+    }
 }

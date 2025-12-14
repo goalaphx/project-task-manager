@@ -26,6 +26,10 @@ export class ProjectDetailsComponent implements OnInit {
   // Sets are efficient, but with OnPush we must manually markForCheck when they change
   pendingTaskIds = new Set<number | string>();
   deletingTaskIds = new Set<number | string>();
+  isEditingProject = false;
+  updatedProject: ProjectDTO = { title: '' };
+  isEditingTask: number | string | null = null;
+  updatedTask: TaskDTO = { title: '' };
 
   constructor(
     private route: ActivatedRoute,
@@ -33,6 +37,63 @@ export class ProjectDetailsComponent implements OnInit {
     private taskService: TaskService,
     private cdr: ChangeDetectorRef // Inject this
   ) {}
+
+  toggleEditProject() {
+    if (this.project) {
+      this.updatedProject = { ...this.project };
+      this.isEditingProject = true;
+    }
+  }
+
+  cancelEditProject() {
+    this.isEditingProject = false;
+  }
+
+  saveProject() {
+    if (this.project && this.project.id) {
+      this.projectService.updateProject(this.project.id, this.updatedProject).subscribe({
+        next: (updatedProject) => {
+          this.project = updatedProject;
+          this.isEditingProject = false;
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.error = e?.message;
+          this.cdr.markForCheck();
+        },
+      });
+    }
+  }
+
+  toggleEditTask(task: TaskDTO) {
+    if (task.id) {
+      this.updatedTask = { ...task };
+      this.isEditingTask = task.id;
+    }
+  }
+
+  cancelEditTask() {
+    this.isEditingTask = null;
+  }
+
+  saveTask(task: TaskDTO) {
+    if (task.id) {
+      this.taskService.updateTask(task.id, this.updatedTask).subscribe({
+        next: (updatedTask) => {
+          const index = this.tasks.findIndex((t) => t.id === task.id);
+          if (index !== -1) {
+            this.tasks[index] = updatedTask;
+          }
+          this.isEditingTask = null;
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          this.error = e?.message;
+          this.cdr.markForCheck();
+        },
+      });
+    }
+  }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));

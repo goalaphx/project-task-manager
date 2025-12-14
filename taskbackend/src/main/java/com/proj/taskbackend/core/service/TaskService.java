@@ -70,6 +70,23 @@ public class TaskService {
         return mapToDTO(taskRepository.save(task));
     }
 
+    public TaskDTO updateTask(Long taskId, TaskDTO taskDto) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        User user = getCurrentUser();
+        if (!task.getProject().getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Not authorized to update this task");
+        }
+
+        task.setTitle(taskDto.getTitle());
+        task.setDescription(taskDto.getDescription());
+        task.setDueDate(taskDto.getDueDate());
+
+        Task updatedTask = taskRepository.save(task);
+        return mapToDTO(updatedTask);
+    }
+
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
     }
