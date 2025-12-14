@@ -30,44 +30,25 @@ A full-stack web application for managing projects and their associated tasks. U
 
 Make sure you have the following installed on your local machine:
 
--   [Java JDK 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
--   [Node.js and npm](https://nodejs.org/en/)
 -   [Docker and Docker Compose](https://www.docker.com/products/docker-desktop/)
 
-### Backend & Database Setup (using Docker Compose)
+### Running the Application with Docker Compose
 
 1.  **Navigate to the project root directory:**
     ```bash
     cd project-task-manager
     ```
-    (Ensure you are in the directory containing `docker-compose.yml` and the `taskbackend` folder.)
-2.  **Update Database Credentials (if necessary):**
-    If you need to change the MySQL username or password (default is `root`/`password`), edit the `application.properties` file in `taskbackend/src/main/resources/application.properties` and the `docker-compose.yml` file.
-3.  **Build and run the backend and database:**
+2.  **Build and run the entire application:**
     ```bash
     docker-compose up --build
     ```
     This command will:
-    -   Build the backend Spring Boot application's Docker image.
-    -   Start the MySQL database container.
-    -   Start the backend application container.
-    The backend server will be accessible at `http://localhost:8080`.
+    -   Build the Docker image for the frontend application.
+    -   Build the Docker image for the backend application.
+    -   Start the `frontend`, `backend`, and `db` services.
 
-### Frontend Setup
+    The application will be accessible at `http://localhost`. The frontend is served on port 80, the backend on port 8080, and the MySQL database on port 3306.
 
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd taskfrontend
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Run the application:**
-    ```bash
-    npm start
-    ```
-    The frontend development server will start. Open your browser and navigate to `http://localhost:4200`.
 
 ## 📹 Demo Video
 
