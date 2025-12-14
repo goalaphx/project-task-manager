@@ -19,6 +19,7 @@ export class ProjectDetailsComponent implements OnInit {
   tasks: TaskDTO[] = [];
   newTitle = '';
   newDescription = '';
+  newDueDate: string = '';
   error: string | null = null;
   addingTask = false;
   
@@ -71,7 +72,13 @@ export class ProjectDetailsComponent implements OnInit {
     if (!this.project?.id || !this.newTitle.trim()) return;
     
     const tempId = `temp-${Date.now()}`;
-    const tempTask: TaskDTO = { id: tempId, title: this.newTitle, description: this.newDescription, status: 'PENDING' };
+    const tempTask: TaskDTO = { 
+        id: tempId, 
+        title: this.newTitle, 
+        description: this.newDescription, 
+        status: 'PENDING',
+        dueDate: this.newDueDate
+    };
 
     // Optimistic Update
     this.tasks = [tempTask, ...this.tasks];
@@ -82,9 +89,10 @@ export class ProjectDetailsComponent implements OnInit {
     const projectId = this.project.id;
     this.newTitle = '';
     this.newDescription = '';
+    this.newDueDate = '';
     this.addingTask = true;
 
-    this.taskService.createTask(projectId, { title: tempTask.title, description: tempTask.description }).subscribe({
+    this.taskService.createTask(projectId, { title: tempTask.title, description: tempTask.description, dueDate: tempTask.dueDate }).subscribe({
       next: (t) => {
         const idx = this.tasks.findIndex(x => x.id === tempId);
         if (idx !== -1) {

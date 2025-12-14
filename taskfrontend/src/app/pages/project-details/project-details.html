@@ -165,6 +165,13 @@
                                       placeholder="Add details..."
                                       style="height: 100px; resize: none;"></textarea>
                         </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium small">Due Date (Optional)</label>
+                            <input class="form-control" 
+                                   type="date"
+                                   name="dueDate" 
+                                   [(ngModel)]="newDueDate">
+                        </div>
                         <button class="btn btn-dark w-100 py-2 fw-medium" 
                                 type="submit" 
                                 [disabled]="addingTask || !newTitle">
