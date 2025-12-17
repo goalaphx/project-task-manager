@@ -12,7 +12,7 @@ export interface ProjectDTO {
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-  private apiUrl = 'http://localhost:8080/api/projects'; // Check your port
+  private apiUrl = '/api/projects'; // Check your port
 
   constructor(private http: HttpClient) {}
 

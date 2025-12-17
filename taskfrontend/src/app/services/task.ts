@@ -14,7 +14,7 @@ export interface TaskDTO {
   providedIn: 'root',
 })
 export class TaskService {
-  private apiBase = 'http://localhost:8080/api';
+  private apiBase = '/api';
 
   constructor(private http: HttpClient) {}
 

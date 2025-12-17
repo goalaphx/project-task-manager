@@ -1,0 +1,10 @@
+{
+  "name": "project-task-manager",
+  "version": "1.0.0",
+  "description": "Project Task Manager",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

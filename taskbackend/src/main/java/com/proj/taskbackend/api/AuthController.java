@@ -31,7 +31,7 @@ public class AuthController {
     // Use Secure; localhost is treated as a secure context in modern browsers.
     String token = authResponse.getToken();
     int maxAge = 24 * 60 * 60; // 1 day
-    String cookieValue = String.format("jwt=%s; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=%d", token, maxAge);
+    String cookieValue = String.format("jwt=%s; Path=/; HttpOnly; SameSite=None; Max-Age=%d", token, maxAge);
     response.addHeader("Set-Cookie", cookieValue);
 
         // 4. Return a simple success message (No token in body!)
@@ -51,7 +51,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletResponse response) {
         // Expire cookie with SameSite and Secure attributes so browser removes it
-        String cookieValue = String.format("jwt=%s; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=%d", "", 0);
+        String cookieValue = String.format("jwt=%s; Path=/; HttpOnly; SameSite=None; Max-Age=%d", "", 0);
         response.addHeader("Set-Cookie", cookieValue);
         return ResponseEntity.ok("Logged out");
     }

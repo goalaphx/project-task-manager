@@ -8,7 +8,7 @@ import { UserService } from './user.service';
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/api/auth'; // Backend controller base
+  private apiUrl = '/api/auth'; // Backend controller base
 
   constructor(private http: HttpClient, private userService: UserService) { }
 
