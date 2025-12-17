@@ -52,4 +52,4 @@ Make sure you have the following installed on your local machine:
 
 ## 📹 Demo Video
 
-*[Link to your 1-2 minute demo video will go here. You can upload it to YouTube, Google Drive, etc.]*
+https://drive.google.com/file/d/18WOy2AfRzO5Z8Nt5X1UTkgQdZGAZZG7P/view?usp=sharing
